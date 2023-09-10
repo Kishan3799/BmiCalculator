@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -45,6 +47,7 @@ fun ResultScreen(
             .background(
                 color = Color(0xFF08101E)
             )
+            .verticalScroll(rememberScrollState())
     ){
         Column(
             modifier = Modifier
@@ -145,7 +148,7 @@ fun ResultScreen(
                             0.349f,
                             0.0f,
                             1.0f
-                        )
+                            )
                         )
                     }else if(resultViewModel.result.toFloat() in 35.00..39.9){
                         ResultText(resultText = "Obesity Class 2", color = Color(
@@ -153,7 +156,7 @@ fun ResultScreen(
                             0.282f,
                             0.0f,
                             1.0f
-                        )
+                            )
                         )
                     }else if(resultViewModel.result.toFloat() >= 40.00){
                         ResultText(resultText = "Obesity Class 3", color = Color(
@@ -161,20 +164,18 @@ fun ResultScreen(
                             0.0f,
                             0.0f,
                             1.0f
-                        )
+                            )
                         )
                     }
                 }
-
             }
-
+            Spacer(modifier = Modifier.height(24.dp))
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 Button(
                     onClick = {
-
                               navController.navigate("bmi_screen"){
                                   popUpTo(navController.graph.id){
                                       inclusive = true
@@ -210,9 +211,6 @@ fun ResultScreen(
                     )
                 }
             }
-
-
-
         }
     }
 }
@@ -220,5 +218,5 @@ fun ResultScreen(
 @Preview
 @Composable
 fun ResultScreenPrev() {
-    ResultScreen(navController = rememberNavController())
+    ResultScreen(resultViewModel = MainViewModel(),navController = rememberNavController())
 }
