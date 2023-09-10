@@ -1,6 +1,6 @@
 package com.kishan.bmicalculator
 
-import android.widget.Toast
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -40,37 +39,21 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.kishan.bmicalculator.common.EditTextField
 import com.kishan.bmicalculator.common.GenderChooseButton
-import java.math.RoundingMode
-import java.text.DecimalFormat
-
+import androidx.lifecycle.viewmodel.compose.viewModel
 @Composable
 fun CalculatorScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: MainViewModel = viewModel(),
 ) {
-    val context = LocalContext.current
-    var isValid by rememberSaveable { mutableStateOf(false) }
-    var gender by rememberSaveable {
-        mutableStateOf("")
-    }
+    val isValid by rememberSaveable { mutableStateOf(false) }
+
     var isSelectMale by rememberSaveable {
         mutableStateOf(false)
     }
     var isSelectFemale by rememberSaveable {
         mutableStateOf(false)
     }
-    var height by rememberSaveable {
-        mutableStateOf("")
-    }
-    var weight by rememberSaveable {
-        mutableStateOf("")
-    }
-    var name by rememberSaveable {
-        mutableStateOf("")
-    }
-    var age by rememberSaveable {
-        mutableStateOf("")
-    }
-    var result:String
+
     Box(modifier = Modifier
         .fillMaxSize()
         .background(
@@ -106,7 +89,7 @@ fun CalculatorScreen(
                     imageId = R.drawable.faceman,
                     isSelected = isSelectMale,
                     onClick = {
-                        gender = "Male"
+                        viewModel.updateGender("Male")
                         isSelectMale = true
                         isSelectFemale = false
                               },
@@ -117,7 +100,7 @@ fun CalculatorScreen(
                     imageId = R.drawable.facewoman,
                     isSelected = isSelectFemale,
                     onClick = {
-                        gender = "Female"
+                        viewModel.updateGender("Female")
                         isSelectFemale = true
                         isSelectMale = false
                               },
@@ -136,10 +119,9 @@ fun CalculatorScreen(
             ) {
                 EditTextField(
                     placeHolder = "Height in (Cm's)",
-                    value = height,
-                    onChangeValue = {
-                        height = it
-                        isValid = it.isNotEmpty()
+                    value = viewModel.height,
+                    onChangeValue = { userHeight ->
+                        viewModel.updateHeight(userHeight)
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
@@ -149,10 +131,9 @@ fun CalculatorScreen(
                 )
                 EditTextField(
                     placeHolder = "Weigh in (Kg's)",
-                    value = weight,
-                    onChangeValue = {
-                        weight = it
-                        isValid = it.isNotEmpty()
+                    value = viewModel.weight,
+                    onChangeValue = { userWeight ->
+                        viewModel.updateWeight(userWeight)
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
@@ -163,10 +144,9 @@ fun CalculatorScreen(
 
                 EditTextField(
                     placeHolder = "Your Name",
-                    value = name,
-                    onChangeValue = {
-                        name = it
-                        isValid = it.isNotEmpty()
+                    value = viewModel.userName,
+                    onChangeValue = {name ->
+                        viewModel.updateName(name)
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
@@ -177,10 +157,9 @@ fun CalculatorScreen(
 
                 EditTextField(
                     placeHolder = "Age",
-                    value = age,
-                    onChangeValue = {
-                        age = it
-                        isValid = it.isNotEmpty()
+                    value = viewModel.userAge,
+                    onChangeValue = {age->
+                        viewModel.updateAge(age)
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
@@ -196,16 +175,8 @@ fun CalculatorScreen(
             ) {
                 Button(
                     onClick = {
-                        if(!isValid){
-                            Toast.makeText(context,"Please field this", Toast.LENGTH_SHORT).show()
-                        }
-                        if(isSelectMale or isSelectFemale){
-                            Toast.makeText(context,"Please select your gender", Toast.LENGTH_SHORT).show()
-                        }
-                        result = calculateBmi(height = height, weight = weight)
-                        navController.navigate("result_screen/$result/$name/$age/$gender")
-//                        Log.d("RESULT" , result)
-
+                        viewModel.calculateBmiIndex()
+                        navController.navigate("result_screen")
                     },
                     contentPadding = PaddingValues(18.dp),
                     modifier = Modifier
@@ -238,26 +209,9 @@ fun CalculatorScreen(
     }
 }
 
-//fun validation(name:String, age:String, height: String, weight: String){
-//    if(name.isEmpty() ){
-//
-//    }
-//}
-
-fun calculateBmi(height:String, weight:String) : String {
-    val heightInMeter = height.toDouble()/100
-    val bmi: Double = weight.toDouble()/(heightInMeter * heightInMeter)
-
-    //for up to two decimal
-    val df = DecimalFormat("#.##")
-    df.roundingMode = RoundingMode.DOWN
-    val roundOff = df.format(bmi)
-
-    return roundOff.toString()
-}
 
 @Preview
 @Composable
 fun CalculatorScreenPreview() {
-    CalculatorScreen(navController = rememberNavController())
+    CalculatorScreen(viewModel = MainViewModel() ,navController = rememberNavController())
 }

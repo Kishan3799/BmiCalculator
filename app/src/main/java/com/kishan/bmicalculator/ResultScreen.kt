@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.kishan.bmicalculator.common.ResultText
@@ -35,11 +36,8 @@ import com.kishan.bmicalculator.common.ResultText
 
 @Composable
 fun ResultScreen(
-    result:String,
-    name:String,
-    age:String,
-    gender:String,
-    navController: NavController
+    resultViewModel: MainViewModel = viewModel(),
+    navController: NavController,
 ) {
     Box(
         modifier = Modifier
@@ -84,7 +82,7 @@ fun ResultScreen(
                 contentAlignment = Alignment.Center
             ){
                 Text(
-                    text = result,
+                    text = resultViewModel.result,
                     color = Color.White,
                     style = TextStyle(
                         fontSize = 70.sp,
@@ -106,7 +104,7 @@ fun ResultScreen(
                 ) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Hi $name",
+                        text = "Hi ${resultViewModel.userName}",
                         style = TextStyle(
                             fontSize = 28.sp,
                             fontWeight = FontWeight(500),
@@ -116,7 +114,7 @@ fun ResultScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = age,
+                        text = resultViewModel.userAge,
                         style = TextStyle(
                             fontSize = 28.sp,
                             fontWeight = FontWeight(500),
@@ -126,7 +124,7 @@ fun ResultScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = gender,
+                        text = resultViewModel.gender,
                         style = TextStyle(
                             fontSize = 28.sp,
                             fontWeight = FontWeight(500),
@@ -135,13 +133,13 @@ fun ResultScreen(
                         )
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    if(result.toFloat() < 18.5){
+                    if(resultViewModel.result.toFloat() < 18.5){
                         ResultText(resultText = "Under Weight", color = Color.Cyan)
-                    }else if(result.toFloat() in 18.5..24.9){
+                    }else if(resultViewModel.result.toFloat() in 18.5..24.9){
                         ResultText(resultText = "Normal Weight", color = Color.Green)
-                    }else if(result.toFloat() in 25.00..29.9) {
+                    }else if(resultViewModel.result.toFloat() in 25.00..29.9) {
                         ResultText(resultText = "Over Weight", color = Color.Yellow)
-                    }else if(result.toFloat() in 30.00..34.9){
+                    }else if(resultViewModel.result.toFloat() in 30.00..34.9){
                         ResultText(resultText = "Obesity Class 1", color = Color(
                             1.0f,
                             0.349f,
@@ -149,7 +147,7 @@ fun ResultScreen(
                             1.0f
                         )
                         )
-                    }else if(result.toFloat() in 35.00..39.9){
+                    }else if(resultViewModel.result.toFloat() in 35.00..39.9){
                         ResultText(resultText = "Obesity Class 2", color = Color(
                             1.0f,
                             0.282f,
@@ -157,7 +155,7 @@ fun ResultScreen(
                             1.0f
                         )
                         )
-                    }else if( result.toFloat() >= 40.00){
+                    }else if(resultViewModel.result.toFloat() >= 40.00){
                         ResultText(resultText = "Obesity Class 3", color = Color(
                             1.0f,
                             0.0f,
@@ -176,11 +174,13 @@ fun ResultScreen(
             ) {
                 Button(
                     onClick = {
+
                               navController.navigate("bmi_screen"){
                                   popUpTo(navController.graph.id){
                                       inclusive = true
                                   }
                               }
+                        resultViewModel.reset()
                     },
                     contentPadding = PaddingValues(18.dp),
                     modifier = Modifier
@@ -220,5 +220,5 @@ fun ResultScreen(
 @Preview
 @Composable
 fun ResultScreenPrev() {
-    ResultScreen(result = "43.00",name = "K", age = "22",gender = "male", rememberNavController())
+    ResultScreen(navController = rememberNavController())
 }
